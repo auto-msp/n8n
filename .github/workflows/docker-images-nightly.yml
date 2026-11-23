@@ -41,8 +41,13 @@ jobs:
 
     steps:
       - name: Call Start URL - optionally
+        env:
+          START_URL: ${{github.event.inputs.start-url}}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          [[ "${{github.event.inputs.start-url}}" != "" ]] && curl -v -X POST -d 'url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' ${{github.event.inputs.start-url}} || echo ""
+          [[ "$START_URL" != "" ]] && curl -v -X POST -d "url=$SERVER_URL/$REPOSITORY/actions/runs/$RUN_ID" $START_URL || echo ""
         shell: bash
 
       - name: Checkout
@@ -63,8 +68,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Merge Master - optionally
+        env:
+          MERGE_MASTER: ${{github.event.inputs.merge-master}}
         run: |
-          [[ "${{github.event.inputs.merge-master}}" == "true" ]] && git remote add upstream https://github.com/n8n-io/n8n.git -f; git merge upstream/master --allow-unrelated-histories || echo ""
+          [[ "$MERGE_MASTER" == "true" ]] && git remote add upstream https://github.com/n8n-io/n8n.git -f; git merge upstream/master --allow-unrelated-histories || echo ""
         shell: bash
 
       - name: Build and push to DockerHub
@@ -97,6 +104,8 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/n8n:nightly
 
       - name: Call Success URL - optionally
+        env:
+          SUCCESS_URL: ${{github.event.inputs.success-url}}
         run: |
-          [[ "${{github.event.inputs.success-url}}" != "" ]] && curl -v ${{github.event.inputs.success-url}} || echo ""
+          [[ "$SUCCESS_URL" != "" ]] && curl -v $SUCCESS_URL || echo ""
         shell: bash

@@ -126,8 +126,10 @@ jobs:
 
       - name: Checkout PR
         if: ${{ inputs.pr_number }}
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
         run: |
-          git fetch origin pull/${{ inputs.pr_number }}/head
+          git fetch origin pull/$PR_NUMBER/head
           git checkout FETCH_HEAD
 
       - uses: pnpm/action-setup@v4.0.0
