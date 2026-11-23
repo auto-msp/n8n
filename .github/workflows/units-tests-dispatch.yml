@@ -22,12 +22,15 @@ jobs:
     steps:
       - name: Compute branch
         id: compute-branch
+        env:
+          PR_NUMBER: ${{ inputs.prNumber }}
+          REF: ${{ inputs.ref }}
         run: |
           BRANCH_NAME=""
-          if [[ "${{ inputs.prNumber }}" != "" && "${{ inputs.prNumber }}" != "null" ]]; then
-            BRANCH_NAME="refs/pull/${{ inputs.prNumber }}/merge"
+          if [[ "$PR_NUMBER" != "" && "$PR_NUMBER" != "null" ]]; then
+            BRANCH_NAME="refs/pull/$PR_NUMBER/merge"
           else
-            BRANCH_NAME="${{ inputs.ref }}"
+            BRANCH_NAME="$REF"
           fi
           echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
